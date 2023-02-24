@@ -39,15 +39,7 @@ _deps
 *.exe
 *.out
 *.app
-cimgui/Debug/
-cimgui/cimgui.opensdf
-cimgui/cimgui.sdf
-cimgui/cimgui.v12.suo
-cimgui/Release/
 .idea
-cimgui/.vs/
-cimgui/cimgui.vcxproj.user
-cimgui/x64/
 
 # Test / Build
 bld/
