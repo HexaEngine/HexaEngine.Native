@@ -10,3 +10,6 @@
 [submodule "cimguizmo/ImGuizmo"]
 	path = cimguizmo/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo
+[submodule "cimnodes/imnodes"]
+	path = cimnodes/imnodes
+	url = https://github.com/Nelarius/imnodes
