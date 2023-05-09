@@ -7,3 +7,6 @@
 [submodule "cimgui/imgui"]
 	path = cimgui/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "cimguizmo/ImGuizmo"]
+	path = cimguizmo/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo
