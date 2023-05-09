@@ -16,3 +16,6 @@
 [submodule "cimplot/implot"]
 	path = cimplot/implot
 	url = https://github.com/epezent/implot.git
+[submodule "cstb/stb"]
+	path = cstb/stb
+	url = https://github.com/nothings/stb.git
