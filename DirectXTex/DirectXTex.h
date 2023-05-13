@@ -4,7 +4,7 @@
 #include <d3d12.h>
 #include <d3d11_1.h>
 #include <dxgiformat.h>
-#include "DirectXTex/DirectXTex.h"
+#include "DirectXTex/DirectXTex/DirectXTex.h"
 
 #define API __declspec(dllexport)
 
