@@ -22,7 +22,7 @@ option(BUILD_DX11 "Build with DirectX11 Runtime support" ON)
 option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
 
 # Enable the use of OpenMP for software BC6H/BC7 compression
-option(BC_USE_OPENMP "Build with OpenMP support" OFF)
+option(BC_USE_OPENMP "Build with OpenMP support" ON)
 
 # https://devblogs.microsoft.com/cppblog/spectre-mitigations-in-msvc/
 option(ENABLE_SPECTRE_MITIGATION "Build using /Qspectre for MSVC" OFF)
@@ -71,54 +71,54 @@ include(GNUInstallDirs)
 #--- Library
 set(LIBRARY_HEADERS
     DirectXTex.h
-    DirectXTex/DirectXTex.h
-    DirectXTex/DirectXTex.inl)
+    DirectXTex/DirectXTex/DirectXTex.h
+    DirectXTex/DirectXTex/DirectXTex.inl)
 
 set(LIBRARY_SOURCES
     DirectXTex.cpp
-    DirectXTex/BC.h
-    DirectXTex/DDS.h
-    DirectXTex/DirectXTexP.h
-    DirectXTex/filters.h
-    DirectXTex/scoped.h
-    DirectXTex/BC.cpp
-    DirectXTex/BC4BC5.cpp
-    DirectXTex/BC6HBC7.cpp
-    DirectXTex/DirectXTexCompress.cpp
-    DirectXTex/DirectXTexConvert.cpp
-    DirectXTex/DirectXTexDDS.cpp
-    DirectXTex/DirectXTexHDR.cpp
-    DirectXTex/DirectXTexImage.cpp
-    DirectXTex/DirectXTexMipmaps.cpp
-    DirectXTex/DirectXTexMisc.cpp
-    DirectXTex/DirectXTexNormalMaps.cpp
-    DirectXTex/DirectXTexPMAlpha.cpp
-    DirectXTex/DirectXTexResize.cpp
-    DirectXTex/DirectXTexTGA.cpp
-    DirectXTex/DirectXTexUtil.cpp)
+    DirectXTex/DirectXTex/BC.h
+    DirectXTex/DirectXTex/DDS.h
+    DirectXTex/DirectXTex/DirectXTexP.h
+    DirectXTex/DirectXTex/filters.h
+    DirectXTex/DirectXTex/scoped.h
+    DirectXTex/DirectXTex/BC.cpp
+    DirectXTex/DirectXTex/BC4BC5.cpp
+    DirectXTex/DirectXTex/BC6HBC7.cpp
+    DirectXTex/DirectXTex/DirectXTexCompress.cpp
+    DirectXTex/DirectXTex/DirectXTexConvert.cpp
+    DirectXTex/DirectXTex/DirectXTexDDS.cpp
+    DirectXTex/DirectXTex/DirectXTexHDR.cpp
+    DirectXTex/DirectXTex/DirectXTexImage.cpp
+    DirectXTex/DirectXTex/DirectXTexMipmaps.cpp
+    DirectXTex/DirectXTex/DirectXTexMisc.cpp
+    DirectXTex/DirectXTex/DirectXTexNormalMaps.cpp
+    DirectXTex/DirectXTex/DirectXTexPMAlpha.cpp
+    DirectXTex/DirectXTex/DirectXTexResize.cpp
+    DirectXTex/DirectXTex/DirectXTexTGA.cpp
+    DirectXTex/DirectXTex/DirectXTexUtil.cpp)
 
 if(WIN32)
    set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-       DirectXTex/DirectXTexFlipRotate.cpp
-       DirectXTex/DirectXTexWIC.cpp)
+       DirectXTex/DirectXTex/DirectXTexFlipRotate.cpp
+       DirectXTex/DirectXTex/DirectXTexWIC.cpp)
 endif()
 
 set(SHADER_SOURCES
-    DirectXTex/Shaders/BC6HEncode.hlsl
-    DirectXTex/Shaders/BC7Encode.hlsl)
+    DirectXTex/DirectXTex/Shaders/BC6HEncode.hlsl
+    DirectXTex/DirectXTex/Shaders/BC7Encode.hlsl)
 
 if(BUILD_DX11 AND WIN32)
    set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-       DirectXTex/BCDirectCompute.h
-       DirectXTex/BCDirectCompute.cpp
-       DirectXTex/DirectXTexCompressGPU.cpp
-       DirectXTex/DirectXTexD3D11.cpp)
+       DirectXTex/DirectXTex/BCDirectCompute.h
+       DirectXTex/DirectXTex/BCDirectCompute.cpp
+       DirectXTex/DirectXTex/DirectXTexCompressGPU.cpp
+       DirectXTex/DirectXTex/DirectXTexD3D11.cpp)
 endif()
 
 if(BUILD_DX12)
    set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-       DirectXTex/d3dx12.h
-       DirectXTex/DirectXTexD3D12.cpp)
+       DirectXTex/DirectXTex/d3dx12.h
+       DirectXTex/DirectXTex/DirectXTexD3D12.cpp)
 endif()
 
 if(ENABLE_OPENEXR_SUPPORT)
@@ -146,22 +146,22 @@ if(BUILD_DX11 AND WIN32)
     if(NOT USE_PREBUILT_SHADERS)
         add_custom_command(
             OUTPUT "${COMPILED_SHADERS}/BC6HEncode_EncodeBlockCS.inc"
-            MAIN_DEPENDENCY "${PROJECT_SOURCE_DIR}/DirectXTex/Shaders/CompileShaders.cmd"
+            MAIN_DEPENDENCY "${PROJECT_SOURCE_DIR}/DirectXTex/DirectXTex/Shaders/CompileShaders.cmd"
             DEPENDS ${SHADER_SOURCES}
             COMMENT "Generating HLSL shaders..."
             COMMAND ${CMAKE_COMMAND} -E env CompileShadersOutput="${COMPILED_SHADERS}" CompileShaders.cmd > "${COMPILED_SHADERS}/compileshaders.log"
-            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/DirectXTex/Shaders"
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/DirectXTex/DirectXTex/Shaders"
             USES_TERMINAL)
     endif()
 endif()
 
-add_library(${PROJECT_NAME} SHARED ${LIBRARY_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
 
 if(BUILD_DX11 AND WIN32)
    target_include_directories(${PROJECT_NAME} PRIVATE ${COMPILED_SHADERS})
 endif()
 
-source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXTex/*.*)
+source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXTex/DirectXTex/*.*)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/DirectXTex> ${CMAKE_INSTALL_INCLUDEDIR}>)
 
@@ -169,13 +169,22 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
 
+if(BC_USE_OPENMP)
+  find_package(OpenMP)
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+  else()
+    set(BC_USE_OPENMP OFF)
+  endif()
+endif()
+
 if(ENABLE_OPENEXR_SUPPORT)
   find_package(OpenEXR REQUIRED)
   target_link_libraries(${PROJECT_NAME} PRIVATE OpenEXR::OpenEXR)
 endif()
 
 if(NOT MINGW)
-    target_precompile_headers(${PROJECT_NAME} PRIVATE DirectXTex/DirectXTexP.h)
+    target_precompile_headers(${PROJECT_NAME} PRIVATE DirectXTex/DirectXTex/DirectXTexP.h)
 endif()
 
 if(MINGW OR (NOT WIN32))
@@ -344,6 +353,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         foreach(t IN LISTS TOOL_EXES ITEMS ${PROJECT_NAME})
           target_compile_options(${t} PRIVATE /Zc:templateScope /Zc:checkGwOdr)
         endforeach()
+    endif()
+
+    if(BC_USE_OPENMP)
+      # OpenMP in MSVC is not compatible with /permissive unless you disable two-phase lookup
+      target_compile_options(${PROJECT_NAME} PRIVATE /Zc:twoPhase-)
+      if(BUILD_TOOLS AND BUILD_DX11 AND WIN32)
+        target_compile_options(texconv PRIVATE /Zc:twoPhase-)
+      endif()
     endif()
 
     set(WarningsEXE "/wd4061" "/wd4062" "/wd4365" "/wd4514" "/wd4625" "/wd4626" "/wd4627" "/wd4668" "/wd4710" "/wd4751" "/wd4820" "/wd5026" "/wd5027" "/wd5039" "/wd5045" "/wd5219")
